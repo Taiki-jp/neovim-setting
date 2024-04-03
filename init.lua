@@ -16,7 +16,6 @@ require('nvim-tree').setup({
   },
 })
 
-
 -- Setup nvim-treesitter
 require 'nvim-treesitter.configs'.setup {
   ensure_installed = { "c", "lua", "vim", "vimdoc", "query" },
