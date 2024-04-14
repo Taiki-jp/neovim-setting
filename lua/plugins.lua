@@ -99,6 +99,15 @@ return packer.startup(function(use)
   use({ 'BlakeWilliams/vim-pry' })
 
   use({ 'github/copilot.vim' })
+  -- Copilot Chat for Neovim
+  use({
+    'CopilotC-Nvim/CopilotChat.nvim',
+    branch = "canary",
+    dependencies = { { "zbirenaum/copilot.lua" }, { "nvim-lua/plenary.nvim" } },
+    opts = {
+      debug = true,
+    },
+  })
   -- Git
   use({ 'lewis6991/gitsigns.nvim' })
   use { 'dinhhuy258/git.nvim' }

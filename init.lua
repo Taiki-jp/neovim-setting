@@ -4,7 +4,7 @@ require("autocmds")
 require("options")
 require("keymaps")
 require("colorscheme")
-
+require("copilot-chat")
 require("mason").setup()
 
 -- Setup nvim-tree
@@ -177,8 +177,39 @@ end
 local comment = require('Comment')
 comment.setup()
 
--- Setup rails.vim
+-- Setup rails.vim cause error
 -- require('vim-rails').setup()
+
+-- Rails custom keymaps and command
+-- execute model test with :RailsTestModel. only works when opening a model file
+function rails_test_model()
+  local filetype = vim.bo.filetype
+  if filetype == 'ruby' then
+    vim.cmd('!bundle exec rails test test/models/' .. GetTestFilePath())
+  end
+end
+
+function GetTestFilePath()
+  -- 現在のファイル名を取得 %: 現在のファイル名取得、:t: tailの意味。ファイルパスの最後の部分を取得
+  local filename = vim.fn.expand('%:t')
+
+  -- ファイル名が既にテストファイルの場合はそのまま返す
+  if string.match(filename, '_test.rb$') then
+    return vim.fn.expand('%:t')
+  end
+
+  -- テストファイルのパスを生成
+  local base = vim.fn.expand('%:t:r')
+  print("base: " .. base)
+  local testfile = base .. '_test.rb'
+
+  return testfile
+end
+
+vim.api.nvim_create_user_command("RailsTestModel", function(opts)
+  vim.cmd("lua rails_test_model()")
+end, {})
+vim.api.nvim_set_keymap('n', '<leader>r', 'lua rails_test_model()<CR>', { noremap = true, silent = true })
 
 function insert_pry()
   local filetype = vim.bo.filetype
@@ -265,3 +296,8 @@ require('git').setup({
   -- Enable winbar in all windows created by this plugin
   winbar = false,
 })
+
+-- Github Copilot Chat
+require("CopilotChat").setup {
+  debug = true,
+}
