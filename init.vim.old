@@ -1,0 +1,127 @@
+"" show row number
+set number
+
+" reference:https://qiita.com/hisayuki/items/99ea1b667de71e908891
+cnoremap init :<C-u>edit $MYVIMRC<CR>                           " init.vim呼び出し
+noremap <Space>s :source $MYVIMRC<CR>                           " init.vim読み込み
+noremap <Space>w :<C-u>w<CR>                                   " ファイル保存
+
+" Insert Mode
+inoremap <silent> jj <ESC>:<C-u>w<CR>
+" Insert mode movekey bind
+inoremap <C-d> <BS>
+inoremap <C-h> <Left>
+inoremap <C-l> <Right>
+inoremap <C-k> <Up>
+inoremap <C-j> <Down>
+
+" assign q instead of v
+nnoremap <C-Q> <C-V>
+
+" Set the clipboard to use win32yank.exe
+let g:clipboard = {
+      \   'name': 'win32yank-wsl',
+      \   'copy': {
+      \      '+': 'win32yank.exe -i --crlf',
+      \      '*': 'win32yank.exe -i --crlf',
+      \    },
+      \   'paste': {
+      \      '+': 'win32yank.exe -o --lf',
+      \      '*': 'win32yank.exe -o --lf',
+      \   },
+      \   'cache_enabled': 0,
+      \ }
+
+" encode setting
+set encoding=utf-8
+" edita setting
+set splitbelow                                                  " 水平分割時に下に表示
+set splitright                                                  " 縦分割時を右に表示
+set noequalalways                                               " 分割時に自動調整を無効化
+set wildmenu                                                    " コマンドモードの補完
+" cursorl setting
+" set ruler                                                       " カーソルの位置表示
+" set cursorline                                                  " カーソルハイライト
+" tab setting
+set expandtab                                                   " tabを複数のspaceに置き換え
+set tabstop=4                                                   " tabは半角2文字
+set shiftwidth=2                                                " tabの幅
+" this setting is needed to use clipboard on wsl. ref: https://github.com/neovim/neovim/issues/12092
+set clipboard=unnamedplus
+
+call plug#begin()
+" ~/.vimrc から持ってきたプラグイン
+Plug 'cocopon/iceberg.vim'
+Plug 'hail2u/vim-css3-syntax'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'kuroitu/pyceberg'
+Plug 'mattn/emmet-vim'
+Plug 'mattn/vim-lsp-settings'
+Plug 'mattn/vim-sqlfmt'
+Plug 'tyru/open-browser.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-surround'
+Plug 'masukomi/vim-markdown-folding'
+Plug 'dhruvasagar/vim-table-mode'
+Plug 'mattn/vim-maketable'
+packloadall
+" 参考
+" https://note.com/histone/n/na8ebb8a5909f
+Plug 'vim-airline/vim-airline-themes'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'ryanoasis/vim-devicons'
+" post install (yarn install | npm install) then load plugin only for editing supported files
+" Plug 'prettier/vim-prettier', {
+"   \ 'do': 'yarn install --frozen-lockfile --production',
+"   \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'svelte', 'yaml', 'html'] }
+call plug#end()
+
+" markdown-folding
+set nocompatible
+if has("autocmd")
+  filetype plugin indent on
+endif
+
+" NERDTree SETTINGS
+nmap <C-f> :NERDTreeToggle<CR>
+nmap ff :FZF<CR>
+" AIR-LINE SETTINGS
+let g:airline_powerline_fonts = 1
+let g:airline_theme = 'papercolor'
+let g:airline#extensions#tabline#enabled = 1
+" nmap <C-p> <Plug>AirlineSelectPrevTab
+" nmap <C-n> <Plug>AirlineSelectNextTab
+
+" /// Enable Netrw (default file browser)
+filetype plugin on
+" /// Netrw SETTINGS
+let g:netwr_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_winsize = 30
+let g:netrw_sizestyle = "H"
+let g:netrw_timefmt = "%Y/%m/%d(%a) %H:%M:%S"
+let g:netrw_preview = 1
+
+" なんかmarkdownの保存の時にバグるからコメントアウト
+" " [markdown] configure formatprg
+" autocmd FileType markdown set formatprg=prettier\ --parser\ markdown
+
+" " [markdown] format on save
+" autocmd! BufWritePre *.md call s:mdfmt()
+" function s:mdfmt()
+"     let l:curw = winsaveview()
+"     silent! exe "normal! a \<bs>\<esc>" | undojoin |
+"         \ exe "normal gggqG"
+"     call winrestview(l:curw)
+" endfunction
+
+let g:table_mode_corner = '|'
+
