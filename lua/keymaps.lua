@@ -73,7 +73,7 @@ keymap("i", "jk", "<ESC>", opts)
 keymap("i", "jj", "<ESC>", opts)
 
 -- コンマの後に自動的にスペースを挿入
-keymap("i", ",", ",<Space>", opts)
+-- keymap("i", ",", ",<Space>", opts)
 
 -- Visual --
 -- Stay in indent mode
