@@ -5,4 +5,7 @@ function CopilotChatBuffer()
   end
 end
 
-vim.api.nvim_set_keymap("n", "<leader>ccq", "<cmd>lua CopilotChatBuffer()<CR>", { noremap = true, silent = true })
+-- Open copilot chat
+vim.api.nvim_set_keymap("n", "<leader>cc", "<cmd>lua CopilotChatBuffer()<CR>", { noremap = true, silent = true })
+-- Toggle copilot chat
+vim.api.nvim_set_keymap("n", "<leader>ct", "<cmd>CopilotChatToggle<CR>", { noremap = true, silent = true })

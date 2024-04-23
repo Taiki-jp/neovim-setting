@@ -10,9 +10,11 @@ require("mason").setup()
 -- Setup nvim-tree
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+vim.g.nvim_tree_hide_dotfiles = 0
 require('nvim-tree').setup({
   view = {
     width = 30,
+    -- show dot files
   },
 })
 
