@@ -18,7 +18,7 @@ require('nvim-tree').setup({
 
 -- Setup nvim-treesitter
 require 'nvim-treesitter.configs'.setup {
-  ensure_installed = { "c", "lua", "vim", "vimdoc", "query" },
+  ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "typescript", "tsx" },
   auto_install = true,
   sync_install = true,
 
@@ -48,6 +48,7 @@ vim.cmd("colorscheme nightfox")
 
 -- Setup nvim-cmp.
 local cmp = require 'cmp'
+local lspkind = require('lspkind')
 local map = cmp.mapping
 
 cmp.setup({
@@ -67,11 +68,33 @@ cmp.setup({
   sources = {
     { name = "nvim_lsp" },
   },
+  formatting = {
+    fields = { 'abbr', 'kind', 'menu' },
+    -- format = lspkind.cmp_format({
+    --   mode = 'text',
+    -- }),
+    format = lspkind.cmp_format({
+      with_text = true,
+      menu = ({
+        nvim_lsp = "[LSP]",
+        luasnip = "[LuaSnip]",
+        buffer = "[Buffer]",
+        path = "[Path]",
+        nvim_lua = "[Lua]",
+        calc = "[Calc]",
+        emoji = "[Emoji]",
+        treesitter = "[Treesitter]",
+      }),
+    }),
+  },
 })
 
 -- Setup language servers.
 local nvim_lsp = require('lspconfig')
+require('lspsaga').setup()
+require('lsp_signature').setup({ hint_enable = false })
 nvim_lsp.pyright.setup {}
+nvim_lsp.tailwindcss.setup {}
 -- nvim_lsp.tsserver.setup {}
 --
 -- nvim_lsp.solargraph.setup {
@@ -151,7 +174,9 @@ nvim_lsp.lua_ls.setup({
 
 local mason_lspconfig = require('mason-lspconfig')
 mason_lspconfig.setup_handlers({ function(server_name)
-  local opts = {}
+  local opts = {
+    capabilities = require('cmp_nvim_lsp').default_capabilities(),
+  }
   opts.on_attach = function(_, bufnr)
     local bufopts = { silent = true, buffer = bufnr }
     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, bufopts)
@@ -163,15 +188,63 @@ mason_lspconfig.setup_handlers({ function(server_name)
 end
 })
 
--- Setup for rubyfmt
--- local null_ls = require('null-ls')
--- null_ls.setup({
---   sources = {
---     null_ls.builtins.formatting.rubyfmt,
---     null_ls.builtins.diagnostics.eslint,
---     null_ls.builtins.completion.spell,
---   },
--- })
+mason_lspconfig.setup {
+  ensure_installed = { "tailwindcss" },
+}
+
+vim.api.nvim_create_autocmd({ 'CursorHold' }, {
+  pattern = { '*' },
+  callback = function()
+    require('lspsaga.diagnostic').get_cursor_diagnostic()
+  end,
+})
+-- Setup for rubyfmt, prettier, eslint
+-- you need to install prettierd if you want to use prettier
+-- ref: https://github.com/fsouza/prettierd
+
+local status, null_ls = pcall(require, 'null-ls')
+if (not status) then return end
+
+null_ls.setup({
+  sources = {
+    null_ls.builtins.formatting.rubyfmt,
+    -- TODO: you need to install eslint_d globally
+    null_ls.builtins.diagnostics.eslint_d.with({
+      diagnostics_format = '[eslint_d] #{m} (#{c})'
+      -- diagnostics_format = '[eslint_d] #{m}\n(#{c})'
+    }),
+    -- null_ls.builtins.formatting.prettier,
+    -- null_ls.builtins.diagnostics.eslint,
+    null_ls.builtins.completion.spell,
+  },
+})
+
+local status, prettier = pcall(require, "prettier")
+if (not status) then return end
+
+prettier.setup {
+  bin = 'prettierd',
+  filetypes = {
+    "css",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "scss",
+    "less",
+  }
+}
+
+vim.api.nvim_create_autocmd({ 'FileType' }, {
+  pattern = { 'typescript', 'typescriptreact', 'typescript.tsx' },
+  callback = function()
+    vim.keymap.set({ 'n' }, '<Plug>(lsp)f', function()
+      vim.cmd([[EslintFixAll]])
+      vim.lsp.buf.format({ name = 'null-ls' })
+    end)
+  end,
+})
 
 -- Setup Comment.nvim
 local comment = require('Comment')
@@ -301,3 +374,10 @@ require('git').setup({
 require("CopilotChat").setup {
   debug = true,
 }
+-- autopairs
+local status, autopairs = pcall(require, "nvim-autopairs")
+if (not status) then return end
+
+autopairs.setup({
+  disabled_filetype = { "TelescopePrompt", "vim" },
+})

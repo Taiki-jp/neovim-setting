@@ -203,3 +203,13 @@ require('gitsigns').setup {
     map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
   end
 }
+-- Autofix entire buffer with eslint_d:
+vim.api.nvim_set_keymap('n', '<leader>f', 'mF:%!eslint_d --stdin --fix-to-stdout<CR>`F',
+  { noremap = true, silent = true })
+
+-- Autofix visual selection with eslint_d:
+vim.api.nvim_set_keymap('v', '<leader>f', ':!eslint_d --stdin --fix-to-stdout<CR>gv', { noremap = true, silent = true })
+
+-- View full diagnostics with Hover or in a split
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float,
+  { noremap = true, silent = true, desc = "Show full diagnostic message" })

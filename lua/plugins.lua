@@ -40,16 +40,21 @@ packer.init({
 
 -- Install your plugins here
 return packer.startup(function(use)
+  -- 日本語対応
+  use('vim-jp/vimdoc-ja')
   -- My plugins here
 
   use({ "wbthomason/packer.nvim" })
   use({ "nvim-lua/plenary.nvim" }) -- Common utilities
 
   -- Colorschemes
-  use({ "EdenEast/nightfox.nvim" })       -- Color scheme
+  use({ "EdenEast/nightfox.nvim" })    -- Color scheme
 
-  use({ "nvim-lualine/lualine.nvim" })    -- Statusline
-  use({ "windwp/nvim-autopairs" })        -- Autopairs, integrates with both cmp and treesitter
+  use({ "nvim-lualine/lualine.nvim" }) -- Statusline
+  use { "windwp/nvim-autopairs", event = "InsertEnter", config = function()
+    require("nvim-autopairs").setup {}
+  end                                     -- Autopairs, integrates with both cmp and treesitter
+  }
   use({ "kyazdani42/nvim-web-devicons" }) -- File icons
   use({ "akinsho/bufferline.nvim" })
 
@@ -62,7 +67,9 @@ return packer.startup(function(use)
   use({ "hrsh7th/cmp-nvim-lsp" })
   use({ "hrsh7th/cmp-nvim-lua" })
   use({ "onsails/lspkind-nvim" })
-
+  -- https://github.com/ray-x/lsp_signature.nvim
+  -- どの引数を入力しているかを表示する
+  use({ 'ray-x/lsp_signature.nvim' })
   -- snippets
   use({ "L3MON4D3/LuaSnip" }) --snippet engine
 
@@ -73,6 +80,7 @@ return packer.startup(function(use)
   -- obsolete. Use mason.nvim instead of nvim-lsp-installer
   -- use({ "williamboman/nvim-lsp-installer" }) -- simple to use language server installer
   use({ "williamboman/mason.nvim" })
+  use({ "jayp0521/mason-null-ls.nvim" })     -- for formatters and linters
   use({ "jose-elias-alvarez/null-ls.nvim" }) -- for formatters and linters
   use({ "glepnir/lspsaga.nvim" })            -- LSP UIs
 
@@ -122,10 +130,10 @@ return packer.startup(function(use)
     end
   })
 
-	use({
-	    "iamcco/markdown-preview.nvim",
-	    run = function() vim.fn["mkdp#util#install"]() end,
-	})
+  use({
+    "iamcco/markdown-preview.nvim",
+    run = function() vim.fn["mkdp#util#install"]() end,
+  })
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
@@ -144,4 +152,3 @@ return packer.startup(function(use)
   -- })
 end)
 -- install without yarn or npm
-
